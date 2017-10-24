@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  item: one
+  price: 9.99
+  stripe_token: MyString
+
+two:
+  user: two
+  item: two
+  price: 9.99
+  stripe_token: MyString
