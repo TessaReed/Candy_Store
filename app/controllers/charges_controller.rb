@@ -1,49 +1,50 @@
 class ChargesController < ApplicationController
+before_action :set_item
   def new
-end
+  end
 
-def create
-  # Amount in cents
+  def create
+  end
 
-  @amount = @item.price
+  def charge
+
+      # here we check if they have used stripe before with us
+      # if current_user.stripeid.present?
+      #   stripe_user = Stripe::Customer.retrieve(current_user.stripeid)
+      # else
+      @amount = @item.price.to_i
+
+      customer = Stripe::Customer.create(
+        :email => params[:stripeEmail],
+        :source  => params[:stripeToken]
+      )
+      current_user.stripeid = customer.id
+      current_user.save()
+
+      charge = Stripe::Charge.create(
+        :amount      => @amount,
+        :description => 'Rails Stripe customer',
+        :currency    => 'aud',
+        :customer    => customer.id,
+      )
+      @transaction = Charge.create(user_id: current_user.id, item_id: @item.id, stripe_charge_id: charge.id)
+      @transaction.save
+      # current_user.user_id.charges.stripe_charge_id.save
+
+      redirect_to charge_path
+      #
 
 
-  # here we check if they have used stripe before with us
-  if current_user.stripeid.present?
-    customer = Stripe::Customer.id
-  else
-    customer = Stripe::Customer.create(
-      :email => params[:stripeEmail],
-      :source  => params[:stripeToken]
-    )
-  #   current_user.stripeid = customer.id
-  # end
 
-  stripe_charge = Stripe::Charge.create(
-    :customer    => customer.id,
-    :amount      => @amount,
-    :description => 'Rails Stripe customer',
-    :currency    => 'usd'
-  )
-
-  # redirect_to charge_path
-
-  # Here we backup to local our charge/receipt thing
-    if 
-
-    @item = item_id
-    @charge = Charge.new(price: @amount)
-    @charge = current_user
-    @charge.user_id = charge.id
-    if @charge.save
-      redirect_to charge_path(@charge)
-    else
-      redirect_to item_path(@item)
+    rescue Stripe::CardError => e
+      flash[:error] = e.message
+      redirect_to new_charge_path
     end
 
-  rescue Stripe::CardError => e
-    flash[:error] = e.message
-    redirect_to new_charge_path
-  end
+private
+
+def set_item
+  @item = Item.find(params[:id])
+end
 
 end

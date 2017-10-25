@@ -2,12 +2,10 @@
 
 one:
   user: one
-  item: one
-  price: 9.99
-  stripe_token: MyString
+  items: one
+  stripe_charge_id: MyString
 
 two:
   user: two
-  item: two
-  price: 9.99
-  stripe_token: MyString
+  items: two
+  stripe_charge_id: MyString
